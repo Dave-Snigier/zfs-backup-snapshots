@@ -102,14 +102,12 @@ function mount_latest_snap() {
 
 
 function usage() {
-	echo <<-EOF
-	The following commands are supported:
-	   cleanup: Unmounts everything from the backup directory
-	     mount: Mounts the latest snapshot for every ZFS filesystem to the backup directory
-	mount-root: Mounts the latest snapshot for the root of the current boot environment
-	 mount-all: Performs cleanup, then mounts all filesystems including root to the backup directory
-	      help: You're looking at it!
-	EOF
+	echo "The following commands are supported:
+   cleanup: Unmounts everything from the backup directory
+     mount: Mounts the latest snapshot for every ZFS filesystem to the backup directory
+mount-root: Mounts the latest snapshot for the root of the current boot environment
+ mount-all: Performs cleanup, then mounts all filesystems including root to the backup directory
+      help: You're looking at it!"
 	exit 0
 }
 
@@ -119,7 +117,7 @@ function cleanup() {
 }
 
 
-function mount() {
+function mountOthers() {
 	# get list of all non-root zfs filesystems on the box not including the ROOT since that has duplicate mountpoints
 	filesystems=( $(zfs list -H -o name | egrep -v "^rpool/ROOT.*") )
 
@@ -148,7 +146,7 @@ function mount-all() {
 	if [[ $? != 0 ]]; then
 		errFlag=true;
 	fi
-	mount
+	mountOthers
 	if [[ $? != 0 ]]; then
 		errFlag=true;
 	fi
@@ -161,7 +159,7 @@ function mount-all() {
 if [[ $1 == "cleanup" ]]; then
 	cleanup
 elif [[ $1 == "mount" ]]; then
-	mount
+	mountOthers
 elif [[ $1 == "mount-root" ]]; then
 	mount-root
 elif [[ $1 == "mount-all" ]]; then
