@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# Only tested with Solaris 11
 # This script will mount the latest snapshot for each zfs filesytem currently mounted on the system into the below directory
 backupDirectory="/networker"
 
@@ -108,12 +108,12 @@ function usage() {
 mount-root: Mounts the latest snapshot for the root of the current boot environment
  mount-all: Performs cleanup, then mounts all filesystems including root to the backup directory
       help: You're looking at it!"
-	exit 0
+	return 0
 }
 
 function cleanup() {
 	zfs_backup_cleanup "${backupDirectory}"
-	exit 0
+	return 0
 }
 
 
@@ -136,21 +136,21 @@ function mount-root() {
 }
 
 function mount-all() {
-	errFlag=false;
+	errFlag=0;
 	# cleanup crap from previous runs
 	cleanup
 	if [[ $? != 0 ]]; then
-		errFlag=true;
+		errFlag=1;
 	fi
 	mount-root
 	if [[ $? != 0 ]]; then
-		errFlag=true;
+		errFlag=1;
 	fi
 	mountOthers
 	if [[ $? != 0 ]]; then
-		errFlag=true;
+		errFlag=1;
 	fi
-	exit ${errFlag}
+	return ${errFlag}
 }
 
 # ==========================================
@@ -158,17 +158,21 @@ function mount-all() {
 
 if [[ $1 == "cleanup" ]]; then
 	cleanup
+	exit $?
 elif [[ $1 == "mount" ]]; then
 	mountOthers
+	exit $?
 elif [[ $1 == "mount-root" ]]; then
 	mount-root
+	exit $?
 elif [[ $1 == "mount-all" ]]; then
 	mount-all
+	exit $?
 elif [[ $1 == "help" ]]; then
 	usage
+	exit $?
 else
 	echo "missing command"
 	echo "For more info, run: zfs_backup_snapshots help"
 	exit 1
 fi
-
