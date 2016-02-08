@@ -189,6 +189,6 @@ elif [[ $1 == "help" ]]; then
         exit $?
 else
         echo "missing command"
-        echo "For more info, run: zfs_backup_snapshots help"
+        usage
         exit 1
 fi
